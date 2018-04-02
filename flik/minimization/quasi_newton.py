@@ -29,9 +29,11 @@ import numpy as np
 CONV = 10E-06
 NUM_ITERS = 30
 
-def quasi_newtons_opt(function, gradient, hessian, val, update=None,
-                inv=False, convergence=CONV, num_iterations=NUM_ITERS):
-    """Quasi-Newton method for approximate hessians.
+def quasi_newtons_opt(function, gradient, hessian, val,
+                      update=None, inv=False,
+                      convergence=CONV,
+                      num_iterations=NUM_ITERS):
+    """Quasi-Newton method for approximating hessians.
 
     Parameters
     ----------
@@ -42,18 +44,18 @@ def quasi_newtons_opt(function, gradient, hessian, val, update=None,
     gradient: Callable
         The gradientient of the given function.
         (1st derivative)
-        returns np.array((N,))
+        returns np.array((N, ))
     hessian : Callable
         The approximation to hessian of the given function.
         (2nd derivative)
-        returns np.array((N,N))
-    val : numpy.ndarray((N,))
+        returns np.array((N, N))
+    val : numpy.ndarray((N, ))
         An initial guess for the function's
         minimum value.
     update : Callable
         Hessian approximation method.
         If none just newtons method.
-        returns np.array((N,N))
+        returns np.array((N, N))
     inv : bool
         Option for inverse Hessian approximation.
         If none then approximate the Hessian.
@@ -66,15 +68,13 @@ def quasi_newtons_opt(function, gradient, hessian, val, update=None,
         in order to reach convergence.
 
     """
-    #TODO: correct docs
-
     # Check input
     if not callable(function):
-        raise TypeError('Fucntion should be callable')
+        raise TypeError('Function should be callable')
     if not callable(gradient):
-        raise TypeError('Gradientient should be callable')
+        raise TypeError('Gradient should be callable')
     if not callable(hessian):
-        raise TypeError('Gradientient should be callable')
+        raise TypeError('Gradient should be callable')
     if not (isinstance(val, np.ndarray) and val.ndim == 1):
         raise TypeError("Argument val should be a 1-dimensional numpy array")
     if not isinstance(convergence, Real):
@@ -189,21 +189,20 @@ def update_hessian_bfgs(hessian, gradient, point, point1, inv=False):
     return newhess
 
 def update_hessian_broyden(hessian, gradient, point, point1, inv=False):
-    """
-    Approximate Hessian with new x
-    Good Broyden style
+    """Approximate Hessian with new x Good Broyden style.
 
     Parameters
     ----------
-    hessian : np.ndarray((N,N))
+    hessian : np.ndarray((N, N))
     gradient : Callable
-    point : np.array((N,))
-    point1 : np.array((N,))
+    point : np.array((N, ))
+    point1 : np.array((N, ))
     inv : str
     
     Returns
     -------
-    hessian : np.ndarray((N,N))
+    hessian : np.ndarray((N, N))
+
     """
     sk = point1 - point
     yk = gradient(point1) - gradient(point)
@@ -219,22 +218,22 @@ def update_hessian_broyden(hessian, gradient, point, point1, inv=False):
         hessian += np.outer(yk, sk.T)
     return hessian
 
-def update_hessian_sr1(hessian, gradient, point, point1, inv=False):
-<<<<<<< HEAD
+def update_hessian_sr1(hessian, gradient, point, point1,
+                       inv=False):
     """Approximate Hessian with new SR1 style.
 
     Parameters
     ----------
-    hessian : np.ndarray((N,N))
+    hessian : np.ndarray((N, N))
         An evaluated hessian (square matrix).
     gradient : Callable
         The gradient of the function (not
         evaluated).
-    point : np.array((N,))
+    point : np.array((N, ))
         An array representing the point at which
         to evaluate the function, gradient, and
         hessian.
-    point1 : np.array((N,))
+    point1 : np.array((N, ))
         An array representing the next point for
         evaluation (k plus 1).
     inv : bool, default False
@@ -244,7 +243,7 @@ def update_hessian_sr1(hessian, gradient, point, point1, inv=False):
 
     Returns
     -------
-    hessian : np.ndarray((N,N))
+    hessian : np.ndarray((N, N))
         The estimation of the hessian (evaluated).
 
     """
@@ -261,22 +260,22 @@ def update_hessian_sr1(hessian, gradient, point, point1, inv=False):
         newhess += np.outer(piece, piece)/np.dot(piece, yk)
     return newhess
 
-def update_hessian_dfp(hessian, gradient, point, point1, inv=False):
-    """
-    Approximate Hessian with new x
-    DFP style
+def update_hessian_dfp(hessian, gradient, point, point1,
+                       inv=False):
+    """Approximate Hessian with new x DFP style.
 
     Parameters
     ----------
-    hessian : np.ndarray((N,N))
+    hessian : np.ndarray((N, N))
     gradient : Callable
-    point : np.array((N,))
-    point1 : np.array((N,))
+    point : np.array((N, ))
+    point1 : np.array((N, ))
     inv : str
 
     Returns
     -------
-    hessian : np.ndarray((N,N))
+    hessian : np.ndarray((N, N))
+
     """
     sk = point1 - point
     yk = gradient(point1) - gradient(point)
