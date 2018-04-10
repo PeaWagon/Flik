@@ -20,7 +20,7 @@ Run with nosetests or run from the terminal.
 
 import numpy as np
 from flik.minimization import quasi_newton
-from flik.MultiVarFunction import MultiVarFunction, Gradient, Hessian
+from flik.multivarfunction import MultiVarFunction, Gradient, Hessian
 from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_equal
 import time
 
@@ -132,10 +132,20 @@ def test_quasi_newton_quad2():
 
     val = np.array([1, 0.1])
 
-    res1 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, update=None)
-    res2 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, quasi_newton.update_hessian_broyden, inv=True)
-    res3 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, quasi_newton.update_hessian_bfgs)
-    res4 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, quasi_newton.update_hessian_dfp, inv=True)
+    res1 = quasi_newton.quasi_newtons_opt(quad2, grad2,
+                                          hess2, val,
+                                          update=None)
+    res2 = quasi_newton.quasi_newtons_opt(quad2, grad2,
+                                          hess2, val,
+                                          quasi_newton.update_hessian_broyden,
+                                          inv=True)
+    res3 = quasi_newton.quasi_newtons_opt(quad2, grad2,
+                                          hess2, val,
+                                          quasi_newton.update_hessian_bfgs)
+    res4 = quasi_newton.quasi_newtons_opt(quad2, grad2,
+                                          hess2, val,
+                                          quasi_newton.update_hessian_dfp,
+                                          inv=True)
 
 
 def test_update_hessian_broyden():
@@ -242,7 +252,7 @@ def test_update_hessian_sr1():
     assert np.equal(hess_eval, np.array([[16, 8], [8, 0]])).all()
     # check regular (non-inverted)
     result1 = quasi_newton.update_hessian_sr1(hess_eval, grad, point, point1, False)
-    assert np.equal(result1, np.array([[16+256/32, 8+512/32],[8+512/32, 1024/32]])).all()
+    assert np.equal(result1, np.array([[16+256/32, 8+512/32], [8+512/32, 1024/32]])).all()
     # check inverted
     result2 = quasi_newton.update_hessian_sr1(hess_eval, grad, point, point1, True)
     top_left = 16+1322500/-73632
