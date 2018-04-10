@@ -29,6 +29,7 @@ import numpy as np
 CONV = 10E-06
 NUM_ITERS = 30
 
+
 def quasi_newtons_opt(function, gradient, hessian, val,
                       update=None, inv=False,
                       convergence=CONV,
@@ -115,13 +116,12 @@ def quasi_newtons_opt(function, gradient, hessian, val,
         # new x
         point1 = point + step_length * step_direction
 
-
         # new hessian callable by approximation
         if update:
             hess = update(hess, gradient, point, point1, inv)
         # update x
         point = point1
-        
+
         # stop when minimum
         if np.allclose(gradient(point), 0, atol=convergence):
             return function(point), point, gradient(point), i
@@ -129,7 +129,7 @@ def quasi_newtons_opt(function, gradient, hessian, val,
 
 
 def update_hessian_bfgs(hessian, gradient, point, point1, inv=False):
-    """BFGs update for quasi-newton.
+    """Bfgs update for quasi-newton.
 
     Returns an estimate of the hessian as to avoid
     evaluating the hessian. Uses equation 6.19 from
@@ -188,6 +188,7 @@ def update_hessian_bfgs(hessian, gradient, point, point1, inv=False):
         newhess = np.dot(np.dot(one, hessian), two) + np.outer(sk, sk)/denom
     return newhess
 
+
 def update_hessian_broyden(hessian, gradient, point, point1, inv=False):
     """Approximate Hessian with new x Good Broyden style.
 
@@ -198,7 +199,7 @@ def update_hessian_broyden(hessian, gradient, point, point1, inv=False):
     point : np.array((N, ))
     point1 : np.array((N, ))
     inv : str
-    
+
     Returns
     -------
     hessian : np.ndarray((N, N))
@@ -217,6 +218,7 @@ def update_hessian_broyden(hessian, gradient, point, point1, inv=False):
         yk /= np.dot(sk, sk)
         hessian += np.outer(yk, sk.T)
     return hessian
+
 
 def update_hessian_sr1(hessian, gradient, point, point1,
                        inv=False):
@@ -260,6 +262,7 @@ def update_hessian_sr1(hessian, gradient, point, point1,
         newhess += np.outer(piece, piece)/np.dot(piece, yk)
     return newhess
 
+
 def update_hessian_dfp(hessian, gradient, point, point1,
                        inv=False):
     """Approximate Hessian with new x DFP style.
@@ -284,7 +287,7 @@ def update_hessian_dfp(hessian, gradient, point, point1,
     if inv:
         a = np.outer(sk, sk) / np.dot(sk, yk)
         b = np.dot(np.dot(newhess, np.outer(yk, yk)), newhess)
-        b /= np.dot(np.dot(yk,newhess),yk)
+        b /= np.dot(np.dot(yk, newhess), yk)
         newhess = newhess + a - b
     # approximate Hessian
     else:

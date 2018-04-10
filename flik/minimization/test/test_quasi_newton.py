@@ -26,24 +26,31 @@ import time
 
 
 def test_multivarfunction_quad2():
+    """Test the MultiVarFunction object against hand-built functions."""
     def f(x):
-        """Test scaction.
+        """Test function.
+
         x : np.array((N,))
         f(x) : np.array((1))
+
         """
         return np.array([3*x[1]*x[0]**2 - 7*x[0]*x[1] - 9])
-    
+
     def g(x):
         """Test gradient.
+
         x = np.array((N,))
         g(x) = np.array((N,))
+
         """
         return np.array([6*x[0]*x[1] - 7*x[1], 3*x[0]**2 - 7*x[0]])
-    
+
     def h(x):
         """Test hessian.
+
         x = np.array((N,))
         h(x) = np.array((N,N))
+
         """
         return np.array([[6*x[1], 6*x[0] - 7], [6*x[0] - 7, 0.]])
 
@@ -55,11 +62,12 @@ def test_multivarfunction_quad2():
     assert_equal(quad2(val), f(val))
     assert_equal(grad2(val), g(val))
     assert_equal(hess2(val), h(val))
-    
+
     # check function returns
     assert_equal(quad2(val), np.array([-9]))
     assert_equal(grad2(val), np.array([0, 150]))
     assert_equal(hess2(val), np.array([[0, -43], [-43, 0]]))
+
 
 def test_quasi_newton_quad1():
     """Test newtons_method for a single variable quadratic.
@@ -124,19 +132,14 @@ def test_quasi_newton_quad2():
 
     val = np.array([1, 0.1])
 
-    res1 = quasi_newton.quasi_newtons_opt(quad2, grad2,
-           hess2, val, update=None)
-    res2 = quasi_newton.quasi_newtons_opt(quad2, grad2,
-           hess2, val, quasi_newton.update_hessian_broyden,
-           inv=True)
-    res3 = quasi_newton.quasi_newtons_opt(quad2, grad2,
-           hess2, val, quasi_newton.update_hessian_bfgs)
-    res4 = quasi_newton.quasi_newtons_opt(quad2, grad2,
-           hess2, val, quasi_newton.update_hessian_dfp,
-           inv=True)
+    res1 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, update=None)
+    res2 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, quasi_newton.update_hessian_broyden, inv=True)
+    res3 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, quasi_newton.update_hessian_bfgs)
+    res4 = quasi_newton.quasi_newtons_opt(quad2, grad2, hess2, val, quasi_newton.update_hessian_dfp, inv=True)
+
 
 def test_update_hessian_broyden():
-    """Test broyden approximation"""
+    """Test broyden approximation."""
     quad2 = MultiVarFunction({3: [2, 1], -7: [1, 1], -9: [0, 0]}, 2)
     grad2 = quad2.construct_grad()
     hess2 = quad2.construct_hess()
@@ -148,11 +151,12 @@ def test_update_hessian_broyden():
     val1 = val + step
 
     new_hess = quasi_newton.update_hessian_broyden(hess, grad2, val, val1)
-    answer_is = np.array([[0, -43],[-32.53, 0]])
+    answer_is = np.array([[0, -43], [-32.53, 0]])
     assert_array_almost_equal(new_hess, answer_is, decimal=2)
 
+
 def test_update_hessian_dfp():
-    """Test dfp approximation"""
+    """Test dfp approximation."""
     quad2 = MultiVarFunction({3: [2, 1], +7: [1, 1]}, 2)
     grad2 = quad2.construct_grad()
     hess2 = quad2.construct_hess()
@@ -167,6 +171,7 @@ def test_update_hessian_dfp():
     answer_is = np.array([[0.19, 6.64], [6.64, -0.072]])
     assert_array_almost_equal(new_hess, answer_is, decimal=2)
 
+
 def test_update_hessian_bfgs():
     """Test the update_hessian_bfgs function.
 
@@ -179,7 +184,7 @@ def test_update_hessian_bfgs():
     """
     # make the test function
     # 2xy^2 + 3x^2 + 7
-    func = MultiVarFunction({2: [1, 2], 3:[2, 0], 7:[0, 0]}, 2)
+    func = MultiVarFunction({2: [1, 2], 3: [2, 0], 7: [0, 0]}, 2)
     # make the gradient
     grad = func.construct_grad()
     # check df/dx (partial wrt x)
@@ -203,17 +208,17 @@ def test_update_hessian_bfgs():
     # choose some arbitrary points
     pk = np.array([2, 3])
     pk1 = np.array([3, 4])
-    result1 = quasi_newton.update_hessian_bfgs(hess_eval, 
-                                              grad, pk, pk1,
-                                              False)
+    result1 = quasi_newton.update_hessian_bfgs(hess_eval,
+                                               grad, pk, pk1,
+                                               False)
     # check the resulting array (non-inverse)
     assert np.equal(result1, np.array([
                     [-190+400/44, -160+480/44],
                     [-160+480/44, -140+576/44]])).all()
     # check inverted hessian version
-    result2 = quasi_newton.update_hessian_bfgs(hess_eval, 
-                                              grad, pk, pk1,
-                                              True)
+    result2 = quasi_newton.update_hessian_bfgs(hess_eval,
+                                               grad, pk, pk1,
+                                               True)
     a = np.array([[1-20/44, -24/44], [-20/44, 1-24/44]])
     b = np.array([[6, 8], [8, 4]])
     c = np.array([[1-20/44, -20/44], [-24/44, 1-24/44]])
@@ -221,10 +226,10 @@ def test_update_hessian_bfgs():
     res = np.dot(np.dot(a, b), c) + d
     assert np.equal(result2, res).all()
 
+
 def test_update_hessian_sr1():
-    """Test the update_hessian_bfgs function.
-    """
-    func = MultiVarFunction({4:[2, 1], 5:[0, 1], -6:[0, 0]}, 2)
+    """Test the update_hessian_bfgs function."""
+    func = MultiVarFunction({4: [2, 1], 5: [0, 1], -6: [0, 0]}, 2)
     grad = func.construct_grad()
     hess = func.construct_hess()
     hess_eval = hess([1, 2])
@@ -236,18 +241,21 @@ def test_update_hessian_sr1():
     assert np.equal(yk, np.array([48., 48.])).all()
     assert np.equal(hess_eval, np.array([[16, 8], [8, 0]])).all()
     # check regular (non-inverted)
-    result1 = quasi_newton.update_hessian_sr1(hess_eval, 
-                            grad, point, point1, False)
+    result1 = quasi_newton.update_hessian_sr1(hess_eval, grad, point, point1, False)
     assert np.equal(result1, np.array([[16+256/32, 8+512/32],[8+512/32, 1024/32]])).all()
     # check inverted
-    result2 = quasi_newton.update_hessian_sr1(hess_eval, 
-                            grad, point, point1, True)
-    assert np.equal(result2, np.array([[16+1322500/-73632, 8+441600/-73632],[8+441600/-73632, 147456/-73632]])).all()
+    result2 = quasi_newton.update_hessian_sr1(hess_eval, grad, point, point1, True)
+    top_left = 16+1322500/-73632
+    top_right = 8+441600/-73632
+    lower_left = 8+441600/-73632
+    lower_right = 147456/-73632
+    assert np.equal(result2, np.array([[top_left, top_right], [lower_left, lower_right]])).all()
+
 
 def test_update_hessian_dfp_inverse():
     """Test the update_hessian_dfp function for inverted Hessians."""
     # inverse test
-    func = MultiVarFunction({2:[1, 2], -9:[1, 0], 8:[2, 0]}, 2)
+    func = MultiVarFunction({2: [1, 2], -9: [1, 0], 8: [2, 0]}, 2)
     grad = func.construct_grad()
     hess = func.construct_hess()
     point1 = np.array([3, 2])
@@ -260,12 +268,11 @@ def test_update_hessian_dfp_inverse():
     assert np.equal(sk, np.array([2, 1])).all()
     result = quasi_newton.update_hessian_dfp(hess_eval, grad, point, point1, True)
     a = np.array([[16, 12], [12, 16]])
-    b = np.array([[4/96, 2/96],[2/96, 1/96]])
+    b = np.array([[4/96, 2/96], [2/96, 1/96]])
     c = np.array([[1444, 760], [760, 400]])
     d = np.dot(np.dot(a, c), a)/47744
     res = a + b - d
     assert np.equal(result, res).all()
-
 
 
 if __name__ == "__main__":
